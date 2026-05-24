@@ -9,6 +9,7 @@ Prefer the static registry and generated agent manifests for machine access. Hum
 - Registry: https://cdn.jsdelivr.net/gh/StevenBuglione/wiki-data-registry@main/sources.json
 - Agent registry: https://cdn.jsdelivr.net/gh/StevenBuglione/wiki-data-registry@main/agent-sources.json
 - Wiki agent card: /.well-known/wiki-agent.json
+- Browser agent tools: /agents/
 
 ## Sources
 
