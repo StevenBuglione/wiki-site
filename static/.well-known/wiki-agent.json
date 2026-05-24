@@ -1,11 +1,11 @@
 {
   "schemaVersion": "steve-wiki-agent/v1",
   "name": "AI Wiki",
+  "description": "Repo-backed wiki for humans and AI agents.",
+  "humanHome": "https://stevenbuglione.github.io/wiki-site/",
+  "llmsTxt": "https://stevenbuglione.github.io/wiki-site/llms.txt",
   "registryUrl": "https://cdn.jsdelivr.net/gh/StevenBuglione/wiki-data-registry@main/agent-sources.json",
-  "contentPolicy": {
-    "public": true,
-    "noSecrets": true,
-    "aiGeneratedContentMarked": true,
-    "citationsPreferred": true
-  }
+  "webmcp": { "enabled": false, "tools": [] },
+  "mcp": { "enabled": false },
+  "contentPolicy": { "public": true, "noSecrets": true, "aiGeneratedContentMarked": true, "citationsPreferred": true }
 }

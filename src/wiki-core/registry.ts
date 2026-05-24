@@ -1,1 +1,86 @@
+import type { LoadedWikiPage, ManifestPage, RegistrySource, SourceLatest, WikiManifest, WikiRegistry } from "./types";
+
 export const registryUrl = "https://cdn.jsdelivr.net/gh/StevenBuglione/wiki-data-registry@main/sources.json";
+
+const jsonCache = new Map<string, unknown>();
+const textCache = new Map<string, string>();
+
+async function loadJson<T>(url: string): Promise<T> {
+  if (jsonCache.has(url)) return jsonCache.get(url) as T;
+  const response = await fetch(url, { headers: { Accept: "application/json" } });
+  if (!response.ok) throw new Error(`Failed to fetch ${url}: HTTP ${response.status}`);
+  const data = (await response.json()) as T;
+  jsonCache.set(url, data);
+  return data;
+}
+
+async function loadText(url: string): Promise<string> {
+  if (textCache.has(url)) return textCache.get(url) as string;
+  const response = await fetch(url, { headers: { Accept: "text/markdown,text/plain,*/*" } });
+  if (!response.ok) throw new Error(`Failed to fetch ${url}: HTTP ${response.status}`);
+  const data = await response.text();
+  textCache.set(url, data);
+  return data;
+}
+
+export async function loadRegistry(): Promise<WikiRegistry> {
+  const registry = await loadJson<WikiRegistry>(registryUrl);
+  if (registry.routeMode !== "query") throw new Error("Registry routeMode must be query");
+  return registry;
+}
+
+export async function loadLatest(source: RegistrySource): Promise<SourceLatest> {
+  return await loadJson<SourceLatest>(source.latestUrl);
+}
+
+export async function loadManifest(latest: SourceLatest): Promise<WikiManifest> {
+  return await loadJson<WikiManifest>(latest.manifestUrl);
+}
+
+export function makeWikiUrl(page: Pick<ManifestPage, "sourceId" | "slug">, anchor?: string): string {
+  const params = new URLSearchParams({ s: page.sourceId, p: page.slug });
+  return `/wiki/?${params.toString()}${anchor ? `#${anchor}` : ""}`;
+}
+
+export function resolveAssetUrl(latest: SourceLatest, currentFile: string, target: string): string {
+  if (/^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith("#")) return target;
+  const base = currentFile.split("/").slice(0, -1).join("/");
+  const normalized = new URL(target, `https://local.invalid/${base ? `${base}/` : ""}`).pathname.replace(/^\//, "");
+  return `${latest.assetsBaseUrl}${normalized.replace(/^(\.\.\/)+assets\//, "")}`;
+}
+
+export function resolveLinkUrl(manifest: WikiManifest, sourceId: string, currentFile: string, target: string): string {
+  if (/^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith("#")) return target;
+  const [pathPart, hash] = target.split("#");
+  if (!pathPart.endsWith(".md")) return target;
+  const base = currentFile.split("/").slice(0, -1).join("/");
+  const normalized = new URL(pathPart, `https://local.invalid/${base ? `${base}/` : ""}`).pathname
+    .replace(/^\//, "")
+    .replace(/\.md$/, "");
+  const page = manifest.pages.find(item => item.slug === normalized);
+  return page ? makeWikiUrl({ sourceId, slug: page.slug }, hash) : target;
+}
+
+export async function loadWikiPage(sourceId: string, slug: string): Promise<LoadedWikiPage> {
+  const registry = await loadRegistry();
+  const source = registry.sources.find(item => item.enabled && item.id === sourceId);
+  if (!source) throw new Error(`Unknown wiki source: ${sourceId}`);
+  const latest = await loadLatest(source);
+  const manifest = await loadManifest(latest);
+  const page = manifest.pages.find(item => item.slug === slug);
+  if (!page) throw new Error(`Unknown wiki page: ${sourceId}/${slug}`);
+  const markdown = await loadText(`${latest.contentBaseUrl}${page.file}`);
+  return { source, latest, manifest, page, markdown };
+}
+
+export async function loadAllManifests(): Promise<Array<{ source: RegistrySource; latest: SourceLatest; manifest: WikiManifest }>> {
+  const registry = await loadRegistry();
+  const enabled = registry.sources.filter(source => source.enabled).sort((a, b) => a.order - b.order);
+  return await Promise.all(
+    enabled.map(async source => {
+      const latest = await loadLatest(source);
+      const manifest = await loadManifest(latest);
+      return { source, latest, manifest };
+    }),
+  );
+}
