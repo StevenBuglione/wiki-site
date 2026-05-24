@@ -1,2 +1,3 @@
-# wiki-site
-Docusaurus/React shell for the AI wiki.
+# Wiki Site
+
+Docusaurus/React shell for the AI-native wiki.
