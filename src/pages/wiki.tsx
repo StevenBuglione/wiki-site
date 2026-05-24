@@ -1,5 +1,6 @@
-import React from 'react';
+import React from "react";
+import { WikiApp } from "../components/WikiRuntime";
 
 export default function WikiPage() {
-  return <main><h1>AI Wiki</h1><p>Runtime wiki reader placeholder.</p></main>;
+  return <WikiApp />;
 }
