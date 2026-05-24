@@ -1,0 +1,8 @@
+# AI Wiki
+
+> Repo-backed wiki for humans and AI agents.
+
+## Sources
+- DevOps: https://cdn.jsdelivr.net/gh/StevenBuglione/wiki-data-devops@published/latest-agent.json
+- Homelab: https://cdn.jsdelivr.net/gh/StevenBuglione/wiki-data-homelab@published/latest-agent.json
+- Projects: https://cdn.jsdelivr.net/gh/StevenBuglione/wiki-data-projects@published/latest-agent.json
