@@ -1,0 +1,20 @@
+{
+  "name": "wiki-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "docusaurus start",
+    "build": "docusaurus build",
+    "test": "node scripts/smoke-test.mjs"
+  },
+  "dependencies": {
+    "@docusaurus/core": "latest",
+    "@docusaurus/preset-classic": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-markdown": "latest",
+    "remark-gfm": "latest",
+    "rehype-sanitize": "latest"
+  },
+  "devDependencies": {}
+}
