@@ -239,6 +239,7 @@ export function WikiApp() {
 
 export function SearchApp() {
   useAgentTools();
+  const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState("");
   const [sourceId, setSourceId] = useState("");
   const [status, setStatus] = useState("");
@@ -248,6 +249,7 @@ export function SearchApp() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    setMounted(true);
     loadAllManifests()
       .then(items => {
         setManifests(items);
@@ -279,23 +281,27 @@ export function SearchApp() {
           </div>
           <a href="/wiki-site/agents/">Agent Tools</a>
         </div>
-        <div className={styles.searchControls}>
-          <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search wiki pages" className={styles.searchInput} />
-          <select value={sourceId} onChange={event => setSourceId(event.target.value)} aria-label="Filter source">
-            <option value="">All sources</option>
-            {manifests.map(item => <option key={item.source.id} value={item.source.id}>{item.source.label}</option>)}
-          </select>
-          <select value={status} onChange={event => setStatus(event.target.value)} aria-label="Filter status">
-            <option value="">Any status</option>
-            <option value="draft">Draft</option>
-            <option value="active">Active</option>
-            <option value="deprecated">Deprecated</option>
-          </select>
-          <select value={tag} onChange={event => setTag(event.target.value)} aria-label="Filter tag">
-            <option value="">Any tag</option>
-            {allTags.map(item => <option key={item} value={item}>{item}</option>)}
-          </select>
-        </div>
+        {mounted ? (
+          <div className={styles.searchControls}>
+            <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search wiki pages" className={styles.searchInput} />
+            <select value={sourceId} onChange={event => setSourceId(event.target.value)} aria-label="Filter source">
+              <option value="">All sources</option>
+              {manifests.map(item => <option key={item.source.id} value={item.source.id}>{item.source.label}</option>)}
+            </select>
+            <select value={status} onChange={event => setStatus(event.target.value)} aria-label="Filter status">
+              <option value="">Any status</option>
+              <option value="draft">Draft</option>
+              <option value="active">Active</option>
+              <option value="deprecated">Deprecated</option>
+            </select>
+            <select value={tag} onChange={event => setTag(event.target.value)} aria-label="Filter tag">
+              <option value="">Any tag</option>
+              {allTags.map(item => <option key={item} value={item}>{item}</option>)}
+            </select>
+          </div>
+        ) : (
+          <p>Loading search...</p>
+        )}
         {error ? <p className={styles.error}>{error}</p> : null}
         <div className={styles.resultCount}>{results.length} result{results.length === 1 ? "" : "s"}</div>
         <div className={styles.results}>
