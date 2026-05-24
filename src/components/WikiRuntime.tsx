@@ -75,6 +75,17 @@ function sourceCommitUrl(sourceId: string, commit: string) {
   return `${sourceRepoUrl(sourceId)}/tree/${commit}`;
 }
 
+function inlineText(children: React.ReactNode): string {
+  return React.Children.toArray(children)
+    .map(child => (typeof child === "string" || typeof child === "number" ? String(child) : ""))
+    .join("")
+    .trim();
+}
+
+function isExternalUrl(href: string) {
+  return /^https?:\/\//i.test(href);
+}
+
 function PageActions({ data }: { data: LoadedWikiPage }) {
   const pageUrl = typeof window === "undefined" ? makeWikiUrl(data.page) : new URL(makeWikiUrl(data.page), window.location.origin).href;
   const resource = `wiki://page/${data.source.id}/${data.page.slug}`;
@@ -202,12 +213,24 @@ export function WikiApp() {
               h4: props => <h4 id={slugify(String(props.children ?? ""))}>{props.children}</h4>,
               h5: props => <h5 id={slugify(String(props.children ?? ""))}>{props.children}</h5>,
               h6: props => <h6 id={slugify(String(props.children ?? ""))}>{props.children}</h6>,
-              a: props => (
-                <a
-                  {...props}
-                  href={props.href ? resolveLinkUrl(data.manifest, data.source.id, data.page.file, props.href) : props.href}
-                />
-              ),
+              a: props => {
+                const label = inlineText(props.children);
+                const resolvedHref = props.href ? resolveLinkUrl(data.manifest, data.source.id, data.page.file, props.href) : props.href;
+                const citation = /^\d+$/.test(label) && Boolean(resolvedHref);
+                return (
+                  <a
+                    {...props}
+                    href={resolvedHref}
+                    className={citation ? styles.citationPill : props.className}
+                    aria-label={citation ? `Citation ${label}` : props["aria-label"]}
+                    title={citation ? `Open citation ${label}` : props.title}
+                    target={resolvedHref && isExternalUrl(resolvedHref) ? "_blank" : props.target}
+                    rel={resolvedHref && isExternalUrl(resolvedHref) ? "noopener noreferrer" : props.rel}
+                  >
+                    {citation ? label : props.children}
+                  </a>
+                );
+              },
               img: props => (
                 <img
                   {...props}
