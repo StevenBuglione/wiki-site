@@ -7,6 +7,7 @@ const config: Config = {
   organizationName: 'StevenBuglione',
   projectName: 'wiki-site',
   trailingSlash: true,
+  favicon: 'img/favicon.svg',
   presets: [['classic', { docs: false, blog: false, theme: { customCss: './src/css/custom.css' } }]],
   themeConfig: {
     navbar: {
