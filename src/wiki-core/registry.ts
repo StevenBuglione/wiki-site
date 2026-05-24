@@ -23,6 +23,13 @@ async function loadText(url: string): Promise<string> {
   return data;
 }
 
+function rawGitHubUrl(url: string): string | undefined {
+  const match = url.match(/^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+)\/([^@]+)@([^/]+)\/(.+)$/);
+  if (!match) return undefined;
+  const [, owner, repo, ref, filePath] = match;
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${filePath}`;
+}
+
 export async function loadRegistry(): Promise<WikiRegistry> {
   const registry = await loadJson<WikiRegistry>(registryUrl);
   if (registry.routeMode !== "query") throw new Error("Registry routeMode must be query");
@@ -30,7 +37,15 @@ export async function loadRegistry(): Promise<WikiRegistry> {
 }
 
 export async function loadLatest(source: RegistrySource): Promise<SourceLatest> {
-  return await loadJson<SourceLatest>(source.latestUrl);
+  const latest = await loadJson<SourceLatest>(source.latestUrl);
+  const rawUrl = rawGitHubUrl(source.latestUrl);
+  if (!rawUrl) return latest;
+  try {
+    const rawLatest = await loadJson<SourceLatest>(rawUrl);
+    return rawLatest.sourceCommit !== latest.sourceCommit ? rawLatest : latest;
+  } catch {
+    return latest;
+  }
 }
 
 export async function loadManifest(latest: SourceLatest): Promise<WikiManifest> {
