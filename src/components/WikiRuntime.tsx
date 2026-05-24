@@ -7,6 +7,19 @@ import { loadAllManifests, loadWikiPage, makeWikiUrl, resolveAssetUrl, resolveLi
 import type { LoadedWikiPage, ManifestPage } from "../wiki-core/types";
 import styles from "./WikiRuntime.module.css";
 
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function stripFrontmatter(markdown: string): string {
+  return markdown.startsWith("---\n") ? markdown.replace(/^---\n[\s\S]*?\n---\n?/, "") : markdown;
+}
+
 function useQueryRoute() {
   const params = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search);
   return {
@@ -64,6 +77,12 @@ export function WikiApp() {
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeSanitize]}
             components={{
+              h1: props => <h1 id={slugify(String(props.children ?? ""))}>{props.children}</h1>,
+              h2: props => <h2 id={slugify(String(props.children ?? ""))}>{props.children}</h2>,
+              h3: props => <h3 id={slugify(String(props.children ?? ""))}>{props.children}</h3>,
+              h4: props => <h4 id={slugify(String(props.children ?? ""))}>{props.children}</h4>,
+              h5: props => <h5 id={slugify(String(props.children ?? ""))}>{props.children}</h5>,
+              h6: props => <h6 id={slugify(String(props.children ?? ""))}>{props.children}</h6>,
               a: props => (
                 <a
                   {...props}
@@ -79,7 +98,7 @@ export function WikiApp() {
               ),
             }}
           >
-            {data.markdown}
+            {stripFrontmatter(data.markdown)}
           </ReactMarkdown>
           <div className={styles.tags}>
             {data.page.tags.map(tag => <span key={tag}>{tag}</span>)}

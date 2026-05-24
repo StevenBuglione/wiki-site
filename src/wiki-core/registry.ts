@@ -39,7 +39,8 @@ export async function loadManifest(latest: SourceLatest): Promise<WikiManifest> 
 
 export function makeWikiUrl(page: Pick<ManifestPage, "sourceId" | "slug">, anchor?: string): string {
   const params = new URLSearchParams({ s: page.sourceId, p: page.slug });
-  return `/wiki/?${params.toString()}${anchor ? `#${anchor}` : ""}`;
+  const basePath = typeof window !== "undefined" && window.location.pathname.startsWith("/wiki-site/") ? "/wiki-site" : "";
+  return `${basePath}/wiki/?${params.toString()}${anchor ? `#${anchor}` : ""}`;
 }
 
 export function resolveAssetUrl(latest: SourceLatest, currentFile: string, target: string): string {
