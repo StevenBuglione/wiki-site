@@ -6,7 +6,7 @@ const config: Config = {
   baseUrl: '/wiki-site/',
   organizationName: 'StevenBuglione',
   projectName: 'wiki-site',
-  trailingSlash: false,
+  trailingSlash: true,
   presets: [['classic', { docs: false, blog: false, theme: { customCss: './src/css/custom.css' } }]],
   themeConfig: {
     navbar: {
