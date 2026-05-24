@@ -15,6 +15,7 @@ const config: Config = {
       items: [
         { to: '/wiki/', label: 'Wiki', position: 'left' },
         { to: '/search', label: 'Search', position: 'left' },
+        { to: '/agents', label: 'Agents', position: 'left' },
         { href: 'https://github.com/StevenBuglione/wiki-data-registry', label: 'Registry', position: 'right' },
       ],
     },
