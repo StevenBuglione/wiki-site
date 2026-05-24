@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "steve-wiki-agent/v1",
+  "name": "AI Wiki",
+  "registryUrl": "https://cdn.jsdelivr.net/gh/StevenBuglione/wiki-data-registry@main/agent-sources.json",
+  "contentPolicy": {
+    "public": true,
+    "noSecrets": true,
+    "aiGeneratedContentMarked": true,
+    "citationsPreferred": true
+  }
+}
