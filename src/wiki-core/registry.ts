@@ -1,4 +1,5 @@
 import type { LoadedWikiPage, ManifestPage, RegistrySource, SourceLatest, WikiManifest, WikiRegistry } from "./types";
+import { normalizeCitationMarkdown } from "./citations";
 
 export const registryUrl = "https://cdn.jsdelivr.net/gh/StevenBuglione/wiki-data-registry@main/sources.json";
 
@@ -85,7 +86,7 @@ export async function loadWikiPage(sourceId: string, slug: string): Promise<Load
   const manifest = await loadManifest(latest);
   const page = manifest.pages.find(item => item.slug === slug);
   if (!page) throw new Error(`Unknown wiki page: ${sourceId}/${slug}`);
-  const markdown = await loadText(`${latest.contentBaseUrl}${page.file}`);
+  const markdown = normalizeCitationMarkdown(await loadText(`${latest.contentBaseUrl}${page.file}`));
   return { source, latest, manifest, page, markdown };
 }
 

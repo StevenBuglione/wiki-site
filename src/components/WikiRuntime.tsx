@@ -128,6 +128,10 @@ export function WikiApp() {
   const [data, setData] = useState<LoadedWikiPage | null>(null);
   const [manifests, setManifests] = useState<LoadedManifestSet>([]);
   const [error, setError] = useState("");
+  const renderedMarkdown = useMemo(
+    () => (data ? stripFrontmatter(data.markdown).replace(/^\s*#\s+.+\n/, "") : ""),
+    [data],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -240,7 +244,7 @@ export function WikiApp() {
               ),
             }}
           >
-            {stripFrontmatter(data.markdown).replace(/^\s*#\s+.+\n/, "")}
+            {renderedMarkdown}
           </ReactMarkdown>
           <div className={styles.tags}>
             {data.page.tags.map(tag => <span key={tag}>{tag}</span>)}
