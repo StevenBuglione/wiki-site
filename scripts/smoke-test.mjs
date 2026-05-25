@@ -13,6 +13,7 @@ if (!runtime.includes("styles.citationPill")) throw new Error("runtime must rend
 if (!runtime.includes("Citation ${label}")) throw new Error("citation pills must include accessible labels");
 if (!runtime.includes("/^\\d+$/")) throw new Error("citation pill detection must stay limited to numeric links");
 if (!registryLoader.includes("normalizeCitationMarkdown(await loadText")) throw new Error("wiki pages must normalize citations before rendering");
+if (!registryLoader.includes('normalized.replace(/^assets\\//, "")')) throw new Error("relative wiki images must resolve against assetsBaseUrl without duplicating assets/");
 if (!citations.includes("dedupeNumericCitationLinks")) throw new Error("citation normalizer must dedupe repeated numeric links");
 if (!citations.includes("spaceAdjacentNumericCitationLinks")) throw new Error("citation normalizer must keep adjacent pills readable");
 if (!styles.includes(".citationPill")) throw new Error("citation pill styles are missing");

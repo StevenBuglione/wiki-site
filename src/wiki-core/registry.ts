@@ -63,7 +63,7 @@ export function resolveAssetUrl(latest: SourceLatest, currentFile: string, targe
   if (/^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith("#")) return target;
   const base = currentFile.split("/").slice(0, -1).join("/");
   const normalized = new URL(target, `https://local.invalid/${base ? `${base}/` : ""}`).pathname.replace(/^\//, "");
-  return `${latest.assetsBaseUrl}${normalized.replace(/^(\.\.\/)+assets\//, "")}`;
+  return `${latest.assetsBaseUrl}${normalized.replace(/^assets\//, "")}`;
 }
 
 export function resolveLinkUrl(manifest: WikiManifest, sourceId: string, currentFile: string, target: string): string {
